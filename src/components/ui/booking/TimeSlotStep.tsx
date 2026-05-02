@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,14 +28,14 @@ function CheckIcon() {
 }
 
 // Framer Motion cascade variants
-const gridVariants = {
+const gridVariants: Variants = {
   hidden: {},
   show: {
     transition: { staggerChildren: 0.03 },
   },
 };
 
-const slotVariants = {
+const slotVariants: Variants = {
   hidden: { opacity: 0, y: 8 },
   show: {
     opacity: 1,
