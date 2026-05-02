@@ -33,7 +33,7 @@ export function middleware(request: NextRequest) {
 
   // 3. Basic IP Logging (Para auditoría de seguridad)
   const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
-  response.headers.set('X-Blades-Security-Trace', Buffer.from(ip).toString('base64'));
+  response.headers.set('X-Blades-Security-Trace', btoa(ip));
 
   return response;
 }
