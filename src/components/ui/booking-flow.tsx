@@ -285,7 +285,7 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
             className="relative w-full max-w-lg h-full bg-[#080808] border-l border-white/5 flex flex-col shadow-[-10px_0_50px_rgba(0,0,0,0.5)] will-change-transform"
           >
             {/* Grain Texture Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0 bg-[url('/noise.svg')]" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center justify-between p-8 border-b border-white/[0.03] bg-white/[0.01]">

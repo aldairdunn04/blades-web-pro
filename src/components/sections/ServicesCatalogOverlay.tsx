@@ -100,7 +100,7 @@ export function ServicesCatalogOverlay({ isOpen, onClose, initialService }: Serv
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
-            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            <div className="absolute inset-0 opacity-[0.03] bg-[url('/noise.svg')]" />
           </div>
 
           {/* Header - Fixed at top with editorial style */}

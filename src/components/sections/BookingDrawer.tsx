@@ -34,7 +34,7 @@ export function BookingDrawer({ isOpen, onClose, selectedServices }: BookingDraw
             className="fixed inset-y-0 right-0 z-[101] w-full max-w-xl bg-[#080808] border-l border-white/5 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col"
           >
             {/* Grain Texture */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-0 bg-[url('/noise.svg')]" />
 
             {/* Header */}
             <div className="relative z-10 flex items-center justify-between p-8 border-b border-white/[0.03] bg-white/[0.01]">

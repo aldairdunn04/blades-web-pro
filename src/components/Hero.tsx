@@ -24,7 +24,7 @@ export function Hero({ onOpenBooking }: HeroProps) {
           className="h-full w-full bg-[url('/assets/hero.png')] bg-cover bg-center"
         />
         {/* Animated Dust/Noise Overlay */}
-        <div className="absolute inset-0 z-15 pointer-events-none opacity-[0.05] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        <div className="absolute inset-0 z-15 pointer-events-none opacity-[0.05] mix-blend-overlay bg-[url('/noise.svg')]" />
       </div>
       
       <div className="container relative z-20 text-center px-4 max-w-5xl">

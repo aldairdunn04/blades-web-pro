@@ -8,8 +8,8 @@ export function middleware(request: NextRequest) {
   const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://challenges.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.cartocdn.com https://basemaps.cartocdn.com https://grainy-gradients.vercel.app;
-    img-src 'self' blob: data: https://lh3.googleusercontent.com https://www.gstatic.com https://firebasestorage.googleapis.com https://*.cartocdn.com https://basemaps.cartocdn.com https://grainy-gradients.vercel.app;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.cartocdn.com https://basemaps.cartocdn.com;
+    img-src 'self' blob: data: https://lh3.googleusercontent.com https://www.gstatic.com https://firebasestorage.googleapis.com https://*.cartocdn.com https://basemaps.cartocdn.com;
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' blob: https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://*.cartocdn.com https://basemaps.cartocdn.com;
     frame-src 'self' https://*.firebaseapp.com https://challenges.cloudflare.com;
