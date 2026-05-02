@@ -424,7 +424,7 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
                               <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                             ) : (
                               <>
-                                <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+                                <img src="/assets/google.svg" className="w-5 h-5" alt="Google" />
                                 <span className="text-black font-black text-xs uppercase tracking-[0.2em]">Continuar con Google</span>
                               </>
                             )}
