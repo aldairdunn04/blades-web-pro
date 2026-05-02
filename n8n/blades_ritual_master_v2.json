@@ -1,0 +1,386 @@
+{
+  "name": "Blades Studio - Ritual Maestro Pro Max (Onboarding & Reserva)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-onboarding",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-onboarding",
+      "name": "Webhook - Onboarding",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-booking",
+      "name": "Webhook - Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security';\nconst signature = $('Webhook - Onboarding').item.json.headers['x-blades-signature'];\nconst body = $('Webhook - Onboarding').item.json.body;\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Invalid signature. Ritual unauthorized.');\n}\n\nreturn body;"
+      },
+      "id": "verify-onboarding",
+      "name": "Verify Onboarding Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        350,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security';\nconst signature = $('Webhook - Booking').item.json.headers['x-blades-signature'];\nconst body = $('Webhook - Booking').item.json.body;\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Invalid signature. Ritual unauthorized.');\n}\n\nreturn body;"
+      },
+      "id": "verify-booking",
+      "name": "Verify Booking Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        350,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🔥 *Nuevo Cliente Registrado*\n\n👤 *Nombre:* {{$json[\"displayName\"]}}\n📧 *Email:* {{$json[\"email\"]}}\n📱 *WhatsApp:* {{$json[\"phone\"]}}\n🛠 *Método:* {{$json[\"method\"]}}\n\nEl proceso de bienvenida se activará en 30 minutos.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-onboarding",
+      "name": "Telegram - New Client",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=⚡ **NUEVA RESERVA DE BARBERÍA** ⚡\n\n👤 **CLIENTE:** `{{$json.user.name}}` \n📱 **WHATSAPP:** {{ $json.user.phone ? \"[\" + $json.user.phone + \"](https://wa.me/51\" + $json.user.phone.toString().replace(/\\D/g,'') + \")\" : \"⚠️ No registró teléfono\" }}\n\n-----------------------------------------\n📅 **FECHA:** `{{$json.date.split('T')[0]}}` \n🕒 **HORA:** `{{$json.time}}` \n⌛ **DURACIÓN:** `{{$json.duration}} min` \n💰 **TOTAL:** `S/ {{$json.total}}` \n-----------------------------------------\n\n✂️ **SERVICIOS SELECCIONADOS:**\n{{$json.services.map(s => \"• \" + s.name).join('\\n')}}\n\n{{$json.sensitivity ? \"🚨 **ALERTA: PIEL SENSIBLE**\" : \"✅ Piel Normal\"}}\n💳 **PAGO:** `{{$json.paymentMethod.toUpperCase()}}` \n\n¿Procedemos con la confirmación de esta reserva?",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": {
+            "inline_keyboard": [
+              [
+                {
+                  "text": "✅ Confirmar Reserva",
+                  "callback_data": "=confirm_booking_{{$json[\"user\"][\"uid\"]}}"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "id": "telegram-booking",
+      "name": "Telegram - New Booking",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        400
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Clientes",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{$json[\"uid\"]}}",
+            "Nombre": "={{$json[\"displayName\"]}}",
+            "Email": "={{$json[\"email\"]}}",
+            "Telefono": "={{$json[\"phone\"]}}",
+            "Fecha_Registro": "={{new Date().toLocaleString('es-PE')}}",
+            "Estado": "Activo"
+          }
+        },
+        "options": {
+          "valueInputMode": "RAW"
+        }
+      },
+      "id": "sheets-onboarding",
+      "name": "Sheets - Add Client",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        600,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Citas",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID_Usuario": "={{$json[\"user\"][\"uid\"]}}",
+            "Cliente": "={{$json[\"user\"][\"name\"]}}",
+            "Telefono": "={{$json[\"user\"][\"phone\"]}}",
+            "Fecha": "={{$json[\"date\"].split('T')[0]}}",
+            "Hora": "={{$json[\"time\"]}}",
+            "Duracion": "={{$json[\"duration\"]}} min",
+            "Total": "={{$json[\"total\"]}}",
+            "Servicios": "={{$json[\"services\"].map(s => s.name).join(', ')}}",
+            "Metodo_Pago": "={{$json[\"paymentMethod\"]}}",
+            "Sensibilidad": "={{$json[\"sensitivity\"] ? 'SÍ' : 'NO'}}",
+            "Estado": "Pendiente"
+          }
+        },
+        "options": {
+          "valueInputMode": "RAW"
+        }
+      },
+      "id": "sheets-booking",
+      "name": "Sheets - Log Booking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        600,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "id": "wait-onboarding",
+      "name": "Wait 30m",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        850,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "hours"
+      },
+      "id": "wait-booking",
+      "name": "Wait 4h Experience",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        850,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "Blades Barber Studio <hola@tu-dominio.com>",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "¡Bienvenido a Blades Barber Studio, {{$json[\"displayName\"]}}!",
+        "html": "=<div style=\"background-color: #0a0a0a; padding: 40px 20px; text-align: center; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; background-color: #111111; border: 1px solid #222; border-top: 4px solid #D4AF37; padding: 50px 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\"><div style=\"margin-bottom: 30px;\"><span style=\"color: #D4AF37; font-size: 40px; font-weight: bold; letter-spacing: 10px; border-bottom: 2px solid #D4AF37; padding-bottom: 10px;\">BLADES</span><div style=\"color: #888; font-size: 12px; margin-top: 15px; letter-spacing: 5px; text-transform: uppercase;\">Studio Barbería</div></div><h1 style=\"color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase;\">Bienvenido a la Élite</h1><div style=\"height: 1px; background: linear-gradient(to right, transparent, #D4AF37, transparent); margin: 30px 0;\"></div><p style=\"color: #ffffff; font-size: 18px; line-height: 1.6; margin: 25px 0;\">Es un honor tenerte con nosotros, <strong style=\"color: #D4AF37;\">{{ $json[\"displayName\"] }}</strong>.</p><p style=\"color: #999; font-size: 15px; line-height: 1.8; margin: 20px 0; font-weight: 300;\">Has ingresado a un espacio donde la precisión se encuentra con el arte. En <strong style=\"color: #fff;\">Blades Studio</strong>, cada corte es una declaración de principios.</p><div style=\"background-color: #181818; padding: 30px; border-radius: 4px; margin: 40px 0; border: 1px solid #222;\"><p style=\"color: #D4AF37; margin: 0 0 15px 0; font-size: 13px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;\">⚔️ TU PRIMERA EXPERIENCIA</p><p style=\"color: #ffffff; margin: 0; font-size: 16px; line-height: 1.5;\">Reserva tu sesión ahora y descubre el estándar Blades.</p><div style=\"margin-top: 25px;\"><a href=\"https://bladesstudio.com/booking\" style=\"display: inline-block; background: #D4AF37; color: #000000; padding: 14px 30px; text-decoration: none; font-weight: bold; border-radius: 2px; text-transform: uppercase; letter-spacing: 2px; font-size: 13px;\">Reservar Cita</a></div></div><div style=\"margin-top: 40px; padding-top: 30px; border-top: 1px solid #222;\"><p style=\"color: #555; font-size: 11px; margin: 5px 0; letter-spacing: 2px; text-transform: uppercase;\">Blades Studio | El Arte del Acero</p><p style=\"color: #444; font-size: 10px; margin: 10px 0 0 0;\">📍 Lima, Perú | Este es un mensaje automático.</p></div></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-onboarding",
+      "name": "Resend - Welcome",
+      "type": "n8n-nodes-base.resend",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        200
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "Blades Barber Studio <hola@tu-dominio.com>",
+        "toEmail": "={{$json[\"user\"][\"email\"]}}",
+        "subject": "¡Esperamos que hayas disfrutado tu servicio, {{$json[\"user\"][\"name\"]}}!",
+        "html": "=<div style=\"background-color: #0a0a0a; padding: 40px 20px; text-align: center; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; background-color: #111111; border: 1px solid #222; border-top: 4px solid #D4AF37; padding: 50px 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\"><div style=\"margin-bottom: 30px;\"><span style=\"color: #D4AF37; font-size: 20px; font-weight: bold; letter-spacing: 5px; text-transform: uppercase;\">Misión Cumplida</span></div><h1 style=\"color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 2px; margin-bottom: 20px;\">¿CÓMO QUEDÓ ESE CORTE?</h1><p style=\"color: #999; font-size: 16px; line-height: 1.8; margin: 25px 0;\">Hola <strong style=\"color: #D4AF37;\">{{ $json[\"user\"][\"name\"] }}</strong>, gracias por confiar en nosotros hoy. Esperamos que tu experiencia haya sido impecable.</p><p style=\"color: #ffffff; font-size: 15px; margin-bottom: 30px;\">Tu apoyo nos ayuda a seguir elevando el nivel. Si te ha gustado el trabajo de hoy, haznos el favor de dejar una reseña:</p><div style=\"margin: 35px 0;\"><a href=\"https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID\" style=\"display: inline-block; border: 2px solid #D4AF37; color: #D4AF37; padding: 12px 30px; text-decoration: none; font-weight: bold; border-radius: 2px; text-transform: uppercase; letter-spacing: 2px; font-size: 13px;\">Dejar Reseña en Google</a></div><p style=\"color: #666; font-size: 13px; font-style: italic;\">\"La excelencia no es un acto, es un hábito.\"</p><div style=\"margin-top: 40px; padding-top: 30px; border-top: 1px solid #222;\"><p style=\"color: #D4AF37; font-size: 11px; margin: 5px 0; letter-spacing: 2px; text-transform: uppercase;\">BLADES STUDIO</p></div></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-booking",
+      "name": "Resend - Review",
+      "type": "n8n-nodes-base.resend",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        600
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Verify Onboarding Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Booking": {
+      "main": [
+        [
+          {
+            "node": "Verify Booking Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Onboarding Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - New Client",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets - Add Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Booking Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - New Booking",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets - Log Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Add Client": {
+      "main": [
+        [
+          {
+            "node": "Wait 30m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Log Booking": {
+      "main": [
+        [
+          {
+            "node": "Wait 4h Experience",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30m": {
+      "main": [
+        [
+          {
+            "node": "Resend - Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 4h Experience": {
+      "main": [
+        [
+          {
+            "node": "Resend - Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

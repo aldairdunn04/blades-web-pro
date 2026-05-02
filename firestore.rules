@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper para verificar si el usuario es dueño del documento
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Perfiles de usuario: Solo el dueño lee y escribe
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Reservas: El usuario solo ve sus propias reservas
+    match /bookings/{bookingId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Solo usuarios autenticados pueden crear reservas para sí mismos
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Solo el dueño o sistema puede actualizar
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // Servicios y Maestrias: Lectura pública, escritura prohibida para clientes
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /masteries/{masteryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Denegar todo lo demás por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

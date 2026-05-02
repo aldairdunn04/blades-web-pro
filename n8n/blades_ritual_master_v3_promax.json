@@ -1,0 +1,413 @@
+{
+  "name": "Blades Studio - Ritual Maestro Pro Max (Secure Auth & Automation)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-onboarding",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-onboarding",
+      "name": "Webhook - Onboarding",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-booking",
+      "name": "Webhook - Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security';\nconst headers = $input.item.json.headers || {};\nconst signature = headers['x-blades-signature'];\nconst body = $input.item.json.body;\n\nif (!signature) {\n  throw new Error('Ritual unauthorized: Missing signature.');\n}\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Ritual unauthorized: Dark magic detected (Invalid signature).');\n}\n\nreturn body;"
+      },
+      "id": "verify-onboarding",
+      "name": "Verify Onboarding Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security';\nconst headers = $input.item.json.headers || {};\nconst signature = headers['x-blades-signature'];\nconst body = $input.item.json.body;\n\nif (!signature) {\n  throw new Error('Ritual unauthorized: Missing signature.');\n}\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Ritual unauthorized: Dark magic detected (Invalid signature).');\n}\n\nreturn body;"
+      },
+      "id": "verify-booking",
+      "name": "Verify Booking Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=⚜️ *NUEVO REGISTRO EN EL ESTUDIO* ⚜️\n\n👤 *Nombre:* {{$json.displayName}}\n📧 *Email:* {{$json.email}}\n🛠 *Origen:* {{$json.method.toUpperCase()}}\n\n*Estado:* Apertura de perfil en el Libro de Oro.\n\n_Sincronización completada con éxito._",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-onboarding",
+      "name": "Telegram - New Client Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        0
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendMessage",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=⚜️ *NUEVA CITA DE MAESTRÍA* ⚜️\n\n👤 *Cliente:* {{$json.user.name}}\n📧 *Email:* {{$json.user.email}}\n\n📅 *Fecha:* {{$json.date.split('T')[0]}}\n🕒 *Hora:* {{$json.time}}\n💰 *Inversión:* S/ {{$json.total}}\n💳 *Pago:* {{$json.paymentMethod.toUpperCase()}}\n\n🛠️ *Servicios de Grooming:*\n{{$json.services.map(s => \"- \" + s.name).join('\\n')}}\n\n{{$json.sensitivity ? \"⚠️ *ATENCIÓN: PIEL SENSIBLE*\" : \"✓ Piel Normal\"}}\n\n💬 *Instrucciones:* {{$json.comment || \"Ninguna\"}}\n\n🔗 [Abrir WhatsApp]({{$json.whatsappUrl}})",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-booking",
+      "name": "Telegram - New Booking Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        500,
+        400
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Libro de Oro"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Clientes",
+          "mode": "name",
+          "cachedResultName": "Clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{$json.uid}}",
+            "Nombre": "={{$json.displayName}}",
+            "Email": "={{$json.email}}",
+            "Fecha_Registro": "={{new Date().toLocaleString('es-PE', {timeZone: 'America/Lima'})}}",
+            "Estado": "Activo"
+          }
+        },
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "sheets-onboarding",
+      "name": "Sheets - Libro de Oro (Clientes)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        500,
+        200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Registro de Citas"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Citas",
+          "mode": "name",
+          "cachedResultName": "Citas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID_Usuario": "={{$json.user.uid}}",
+            "Cliente": "={{$json.user.name}}",
+            "Fecha": "={{$json.date}}",
+            "Hora": "={{$json.time}}",
+            "Total": "={{$json.total}}",
+            "Servicios": "={{$json.services.map(s => s.name).join(', ')}}",
+            "Metodo_Pago": "={{$json.paymentMethod}}",
+            "Sensibilidad": "={{$json.sensitivity ? 'SÍ' : 'NO'}}",
+            "Estado": "Pendiente",
+            "Log_Time": "={{new Date().toISOString()}}"
+          }
+        },
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "sheets-booking",
+      "name": "Sheets - Registro de Citas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        500,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "id": "wait-onboarding",
+      "name": "Wait 30m (Onboarding)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "hours"
+      },
+      "id": "wait-booking",
+      "name": "Wait 4h (Post-Service)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "Blades Barber Studio <no-reply@blades.com>",
+        "toEmail": "={{$node[\"Verify Onboarding Signature\"].json.email}}",
+        "subject": "=⚜️ Bienvenido al Legado de Blades Studio, {{$node[\"Verify Onboarding Signature\"].json.displayName}}",
+        "html": "=<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@200;300;400;600&display=swap\" rel=\"stylesheet\"><div style=\"background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;\"><div style=\"max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;\"><div style=\"margin-bottom: 50px;\"><div style=\"color: #D4AF37; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; font-weight: 600;\">ESTABLISHED LIMA</div><h2 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 38px; letter-spacing: 12px; margin: 0; text-transform: uppercase; font-weight: 300;\">BLADES</h2><div style=\"height: 1px; width: 40px; background-color: #D4AF37; margin: 20px auto;\"></div></div><h1 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 28px; font-weight: 300; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase;\">Bienvenido al Legado</h1><p style=\"color: #888888; font-size: 15px; line-height: 1.8; margin: 30px 0; font-weight: 300; letter-spacing: 0.5px;\">Hola <span style=\"color: #D4AF37; font-weight: 400;\">{{ $json[\"displayName\"] }}</span>. Has ingresado a un espacio donde la barbería trasciende lo convencional. En Blades Studio, cada corte es una declaración de maestría y cada cliente es parte de nuestra historia.</p><div style=\"margin: 50px 0;\"><p style=\"color: #ffffff; font-size: 13px; letter-spacing: 2px; margin-bottom: 35px; text-transform: uppercase; font-weight: 400;\">COMIENZA TU TRANSFORMACIÓN</p><a href=\"https://bladesstudio.com/booking\" style=\"display: inline-block; background-color: #D4AF37; color: #050505; padding: 20px 50px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; border-radius: 0;\">Agendar mi Cita</a></div><div style=\"margin-top: 70px; border-top: 1px solid #1a1a1a; padding-top: 40px;\"><p style=\"color: #444; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin: 0; font-weight: 400;\">The Art of Grooming | Blades Studio</p></div></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-onboarding",
+      "name": "Resend - Welcome Email",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        200
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "Blades Barber Studio <no-reply@blades.com>",
+        "toEmail": "={{$node[\"Verify Booking Signature\"].json.user.email}}",
+        "subject": "=⚜️ Cita de Maestría Confirmada - Blades Studio",
+        "html": "=<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@200;300;400;600&display=swap\" rel=\"stylesheet\"><div style=\"background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;\"><div style=\"max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;\"><div style=\"margin-bottom: 50px;\"><h2 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 32px; letter-spacing: 10px; margin: 0; text-transform: uppercase; font-weight: 300;\">BLADES</h2><div style=\"color: #D4AF37; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; margin-top: 8px;\">Master Grooming Studio</div></div><h1 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;\">Cita de Maestría Confirmada</h1><p style=\"color: #888888; font-size: 14px; line-height: 1.6; margin: 20px 0; font-weight: 300;\">Tu espacio ha sido reservado, <span style=\"color: #ffffff; font-weight: 400;\">{{ $node['Verify Booking Signature'].json.user.name }}</span>.<br>Nuestro estudio está listo para tu próxima sesión.</p><div style=\"background-color: #080808; border: 1px solid #1a1a1a; padding: 40px; margin: 40px 0; text-align: left;\"><div style=\"color: #D4AF37; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; font-weight: 600; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px;\">Detalles del Servicio</div><table style=\"width: 100%; color: #ffffff; font-size: 13px; border-collapse: collapse;\"><tr><td style=\"color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;\">Fecha</td><td style=\"text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; color: #D4AF37; font-weight: 400; font-family: 'Cormorant Garamond', serif; font-size: 18px;\">{{ $node['Verify Booking Signature'].json.date.split('T')[0] }}</td></tr><tr><td style=\"color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;\">Hora</td><td style=\"text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; font-weight: 400; font-family: 'Cormorant Garamond', serif; font-size: 18px;\">{{ $node['Verify Booking Signature'].json.time }}</td></tr><tr><td style=\"color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;\">Monto</td><td style=\"text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; font-weight: 600;\">S/ {{ $node['Verify Booking Signature'].json.total }}</td></tr></table><div style=\"margin-top: 35px;\"><p style=\"color: #555; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 12px 0;\">Especialidades:</p><p style=\"color: #ffffff; font-size: 13px; margin: 0; line-height: 1.8; font-weight: 300; letter-spacing: 0.5px;\">{{ $node['Verify Booking Signature'].json.services.map(s => '• ' + s.name).join('<br>') }}</p></div></div><div style=\"margin: 50px 0;\"><a href=\"https://bladesstudio.com/my-bookings\" style=\"display: block; background-color: #D4AF37; color: #050505; padding: 20px 0; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px;\">Gestionar mi Reserva</a><a href=\"https://wa.me/51XXXXXXXXX\" style=\"display: block; background-color: transparent; border: 1px solid #1a1a1a; color: #666; padding: 18px 0; text-decoration: none; font-weight: 400; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;\">Soporte vía WhatsApp</a></div><p style=\"color: #444; font-size: 10px; line-height: 1.8; margin-top: 50px; font-weight: 300; letter-spacing: 1px;\">Agradecemos tu puntualidad.<br>Cada minuto está reservado para tu excelencia.</p></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-confirmation",
+      "name": "Resend - Booking Confirmation",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "operation": "send",
+        "fromEmail": "Blades Barber Studio <no-reply@blades.com>",
+        "toEmail": "={{$node[\"Verify Booking Signature\"].json.user.email}}",
+        "subject": "=⚜️ ¿Cómo fue tu experiencia en Blades Studio?",
+        "html": "=<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@200;300;400;600&display=swap\" rel=\"stylesheet\"><div style=\"background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;\"><div style=\"max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;\"><div style=\"margin-bottom: 50px;\"><h2 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 32px; letter-spacing: 10px; margin: 0; text-transform: uppercase; font-weight: 300;\">BLADES</h2></div><h1 style=\"font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 26px; font-weight: 300; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase;\">Tu Transformación</h1><p style=\"color: #888888; font-size: 15px; line-height: 1.8; margin: 30px 0; font-weight: 300; letter-spacing: 0.5px;\">Hola <span style=\"color: #ffffff; font-weight: 400;\">{{ $json[\"user\"][\"name\"] }}</span>. Gracias por confiar en la maestría de Blades Studio. Tu opinión es el estándar que nos permite seguir elevando el arte del grooming.</p><div style=\"height: 1px; background-color: #1a1a1a; margin: 50px 0;\"></div><p style=\"color: #ffffff; font-size: 12px; letter-spacing: 3px; margin-bottom: 35px; text-transform: uppercase; font-weight: 500;\">¿CÓMO FUE TU EXPERIENCIA?</p><a href=\"https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID\" style=\"display: inline-block; background-color: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 20px 50px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase;\">Dejar una Reseña</a><p style=\"color: #333; font-size: 10px; margin-top: 60px; letter-spacing: 2px; font-weight: 400; text-transform: uppercase;\">\"True mastery is in the details.\"</p></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-booking",
+      "name": "Resend - Post-Booking Review",
+      "type": "n8n-nodes-resend.resend",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        600
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Verify Onboarding Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Booking": {
+      "main": [
+        [
+          {
+            "node": "Verify Booking Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Onboarding Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - New Client Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets - Libro de Oro (Clientes)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Booking Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - New Booking Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sheets - Registro de Citas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Resend - Booking Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Libro de Oro (Clientes)": {
+      "main": [
+        [
+          {
+            "node": "Wait 30m (Onboarding)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Registro de Citas": {
+      "main": [
+        [
+          {
+            "node": "Wait 4h (Post-Service)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30m (Onboarding)": {
+      "main": [
+        [
+          {
+            "node": "Resend - Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 4h (Post-Service)": {
+      "main": [
+        [
+          {
+            "node": "Resend - Post-Booking Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": null
+  },
+  "pinData": {}
+}

@@ -1,0 +1,149 @@
+{
+  "name": "Blades Studio - User Onboarding Ritual Pro Max",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-onboarding",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-1",
+      "name": "Webhook - New Registration",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security'; // MUST MATCH .env.local\nconst signature = $node[\"Webhook - New Registration\"].json.headers['x-blades-signature'];\nconst body = $node[\"Webhook - New Registration\"].json.body;\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Invalid signature. Ritual unauthorized.');\n}\n\nreturn body;"
+      },
+      "id": "code-verify",
+      "name": "Verify Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🔥 *Nuevo Ritual Iniciado*\n\n👤 *Nombre:* {{$node[\"Verify Signature\"].json[\"displayName\"]}}\n📧 *Email:* {{$node[\"Verify Signature\"].json[\"email\"]}}\n🛠 *Método:* {{$node[\"Verify Signature\"].json[\"method\"]}}\n\nEl sistema esperará 30 min antes de enviar el correo de bienvenida automático.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-1",
+      "name": "Telegram - Notify Owner",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [500, 100],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "spreadsheetId": "YOUR_GOOGLE_SHEET_ID",
+        "sheetName": "Clientes",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{$node[\"Verify Signature\"].json[\"uid\"]}}",
+            "Nombre": "={{$node[\"Verify Signature\"].json[\"displayName\"]}}",
+            "Email": "={{$node[\"Verify Signature\"].json[\"email\"]}}",
+            "Fecha": "={{new Date().toISOString()}}"
+          }
+        }
+      },
+      "id": "sheets-1",
+      "name": "Google Sheets - Add Client",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "minutes"
+      },
+      "id": "wait-1",
+      "name": "Wait 30m",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "Blades Barber Studio <hola@tu-dominio.com>",
+        "toEmail": "={{$node[\"Verify Signature\"].json[\"email\"]}}",
+        "subject": "¡Bienvenido al Ritual, {{$node[\"Verify Signature\"].json[\"displayName\"]}}!",
+        "html": "<h1>Bienvenido a Blades</h1><p>Tu cuenta ha sido creada con éxito.</p>",
+        "additionalFields": {}
+      },
+      "id": "resend-1",
+      "name": "Resend - Welcome Email",
+      "type": "n8n-nodes-base.resend",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - New Registration": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Notify Owner",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Add Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add Client": {
+      "main": [
+        [
+          {
+            "node": "Wait 30m",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30m": {
+      "main": [
+        [
+          {
+            "node": "Resend - Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

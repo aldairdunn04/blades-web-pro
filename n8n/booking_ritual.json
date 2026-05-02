@@ -1,0 +1,172 @@
+{
+  "name": "Blades Studio - Ritual de Reserva & Fidelización Pro Max",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-booking",
+      "name": "Webhook - New Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst secret = 'blades_ritual_secret_2024_max_security';\nconst signature = $node[\"Webhook - New Booking\"].json.headers['x-blades-signature'];\nconst body = $node[\"Webhook - New Booking\"].json.body;\n\nconst hmac = crypto.createHmac('sha256', secret);\nhmac.update(JSON.stringify(body));\nconst expectedSignature = hmac.digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error('Invalid signature. Ritual unauthorized.');\n}\n\nreturn body;"
+      },
+      "id": "verify-booking",
+      "name": "Verify Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=⚡ *NUEVA RESERVA CONFIRMADA* ⚡\n\n👤 *Cliente:* {{$json[\"user\"][\"name\"]}}\n📧 *Email:* {{$json[\"user\"][\"email\"]}}\n\n📅 *Fecha:* {{$json[\"date\"].split('T')[0]}}\n🕒 *Hora:* {{$json[\"time\"]}}\n💰 *Total:* S/ {{$json[\"total\"]}}\n💳 *Método:* {{$json[\"paymentMethod\"].toUpperCase()}}\n\n✂️ *Servicios:*\n{{$json[\"services\"].map(s => \"- \" + s.name).join('\\n')}}\n\n{{$json[\"sensitivity\"] ? \"🚨 *ATENCIÓN: PIEL SENSIBLE*\" : \"✅ Piel Normal\"}}\n\n💬 *Nota:* {{$json[\"comment\"] || \"Sin comentarios\"}}\n\n[Abrir en WhatsApp]({{$json[\"whatsappUrl\"]}})",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-notify",
+      "name": "Telegram - Notify Eliot",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        550,
+        150
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CRED_ID"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "spreadsheetId": "YOUR_GOOGLE_SHEET_ID",
+        "sheetName": "Citas",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID_Usuario": "={{$json[\"user\"][\"uid\"]}}",
+            "Cliente": "={{$json[\"user\"][\"name\"]}}",
+            "Fecha": "={{$json[\"date\"]}}",
+            "Hora": "={{$json[\"time\"]}}",
+            "Total": "={{$json[\"total\"]}}",
+            "Servicios": "={{$json[\"services\"].map(s => s.name).join(', ')}}",
+            "Metodo_Pago": "={{$json[\"paymentMethod\"]}}",
+            "Sensibilidad": "={{$json[\"sensitivity\"]}}",
+            "Estado": "Pendiente"
+          }
+        }
+      },
+      "id": "sheets-log",
+      "name": "Google Sheets - Log Booking",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        550,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 4,
+        "unit": "hours"
+      },
+      "id": "wait-post-service",
+      "name": "Wait for Experience",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        800,
+        450
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "Blades Barber Studio <hola@tu-dominio.com>",
+        "toEmail": "={{$node[\"Verify Signature\"].json[\"user\"][\"email\"]}}",
+        "subject": "¡Esperamos que hayas disfrutado tu servicio, {{$node[\"Verify Signature\"].json[\"user\"][\"name\"]}}!",
+        "html": "=<div style=\"background-color: #0a0a0a; padding: 40px 20px; text-align: center; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\"><div style=\"max-width: 600px; margin: 0 auto; background-color: #111111; border: 1px solid #222; border-top: 4px solid #D4AF37; padding: 50px 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);\"><div style=\"margin-bottom: 30px;\"><span style=\"color: #D4AF37; font-size: 20px; font-weight: bold; letter-spacing: 5px; text-transform: uppercase;\">Misión Cumplida</span></div><h1 style=\"color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 2px; margin-bottom: 20px;\">¿CÓMO QUEDÓ ESE CORTE?</h1><p style=\"color: #999; font-size: 16px; line-height: 1.8; margin: 25px 0;\">Hola <strong style=\"color: #D4AF37;\">{{ $node[\"Verify Signature\"].json[\"user\"][\"name\"] }}</strong>, gracias por confiar en nosotros hoy. Esperamos que tu experiencia haya sido impecable.</p><p style=\"color: #ffffff; font-size: 15px; margin-bottom: 30px;\">Tu apoyo nos ayuda a seguir elevando el nivel. Si te ha gustado el trabajo de hoy, haznos el favor de dejar una reseña:</p><div style=\"margin: 35px 0;\"><a href=\"https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID\" style=\"display: inline-block; border: 2px solid #D4AF37; color: #D4AF37; padding: 12px 30px; text-decoration: none; font-weight: bold; border-radius: 2px; text-transform: uppercase; letter-spacing: 2px; font-size: 13px;\">Dejar Reseña en Google</a></div><p style=\"color: #666; font-size: 13px; font-style: italic;\">\"La excelencia no es un acto, es un hábito.\"</p><div style=\"margin-top: 40px; padding-top: 30px; border-top: 1px solid #222;\"><p style=\"color: #D4AF37; font-size: 11px; margin: 5px 0; letter-spacing: 2px; text-transform: uppercase;\">BLADES STUDIO</p></div></div></div>",
+        "additionalFields": {}
+      },
+      "id": "resend-review",
+      "name": "Resend - Review Request",
+      "type": "n8n-nodes-base.resend",
+      "typeVersion": 1,
+      "position": [
+        1050,
+        450
+      ],
+      "credentials": {
+        "resendApi": {
+          "id": "YOUR_RESEND_CRED_ID"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - New Booking": {
+      "main": [
+        [
+          {
+            "node": "Verify Signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Signature": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Notify Eliot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Log Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Booking": {
+      "main": [
+        [
+          {
+            "node": "Wait for Experience",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Experience": {
+      "main": [
+        [
+          {
+            "node": "Resend - Review Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

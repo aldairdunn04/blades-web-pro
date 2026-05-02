@@ -1,0 +1,117 @@
+<!-- BLADES STUDIO - PREMIUM BRAND TEMPLATES (PRO MAX) -->
+<!-- These templates are designed to be ultra-minimalist, high-end, and architectural. -->
+<!-- Using Inter for UI elements and Cormorant Garamond for luxury headers. -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@200;300;400;600&display=swap" rel="stylesheet">
+
+<!-- 1. WELCOME / ONBOARDING EMAIL -->
+<div style="background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;">
+  <div style="max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;">
+    
+    <div style="margin-bottom: 50px;">
+      <div style="color: #D4AF37; font-size: 10px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; font-weight: 600;">ESTABLISHED LIMA</div>
+      <h2 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 38px; letter-spacing: 12px; margin: 0; text-transform: uppercase; font-weight: 300;">BLADES</h2>
+      <div style="height: 1px; width: 40px; background-color: #D4AF37; margin: 20px auto;"></div>
+    </div>
+
+    <h1 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 28px; font-weight: 300; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase;">Bienvenido al Legado</h1>
+    
+    <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 30px 0; font-weight: 300; letter-spacing: 0.5px;">
+      Hola <span style="color: #D4AF37; font-weight: 400;">{{ $json["displayName"] }}</span>. Has ingresado a un espacio donde la barbería trasciende lo convencional. En Blades Studio, cada corte es una declaración de maestría y cada cliente es parte de nuestra historia.
+    </p>
+    
+    <div style="margin: 50px 0;">
+      <p style="color: #ffffff; font-size: 13px; letter-spacing: 2px; margin-bottom: 35px; text-transform: uppercase; font-weight: 400;">COMIENZA TU TRANSFORMACIÓN</p>
+      <a href="https://bladesstudio.com/booking" style="display: inline-block; background-color: #D4AF37; color: #050505; padding: 20px 50px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; border-radius: 0;">Agendar mi Cita</a>
+    </div>
+    
+    <div style="margin-top: 70px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+      <p style="color: #444; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin: 0; font-weight: 400;">The Art of Grooming | Blades Studio</p>
+    </div>
+  </div>
+</div>
+
+<br><br><hr><br><br>
+
+<!-- 2. BOOKING CONFIRMATION EMAIL -->
+<div style="background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;">
+  <div style="max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;">
+    
+    <div style="margin-bottom: 50px;">
+      <h2 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 32px; letter-spacing: 10px; margin: 0; text-transform: uppercase; font-weight: 300;">BLADES</h2>
+      <div style="color: #D4AF37; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; margin-top: 8px;">Master Grooming Studio</div>
+    </div>
+
+    <h1 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;">Cita de Maestría Confirmada</h1>
+    
+    <p style="color: #888888; font-size: 14px; line-height: 1.6; margin: 20px 0; font-weight: 300;">
+      Tu espacio ha sido reservado, <span style="color: #ffffff; font-weight: 400;">{{ $node['Verify Booking Signature'].json.user.name }}</span>.<br>
+      Nuestro estudio está listo para tu próxima sesión.
+    </p>
+    
+    <div style="background-color: #080808; border: 1px solid #1a1a1a; padding: 40px; margin: 40px 0; text-align: left;">
+      <div style="color: #D4AF37; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 30px; text-align: center; font-weight: 600; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px;">Detalles del Servicio</div>
+      
+      <table style="width: 100%; color: #ffffff; font-size: 13px; border-collapse: collapse;">
+        <tr>
+          <td style="color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;">Fecha</td>
+          <td style="text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; color: #D4AF37; font-weight: 400; font-family: 'Cormorant Garamond', serif; font-size: 18px;">{{ $node['Verify Booking Signature'].json.date.split('T')[0] }}</td>
+        </tr>
+        <tr>
+          <td style="color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;">Hora</td>
+          <td style="text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; font-weight: 400; font-family: 'Cormorant Garamond', serif; font-size: 18px;">{{ $node['Verify Booking Signature'].json.time }}</td>
+        </tr>
+        <tr>
+          <td style="color: #555; padding: 15px 0; border-bottom: 1px solid #141414; text-transform: uppercase; font-size: 10px; letter-spacing: 2px;">Monto</td>
+          <td style="text-align: right; padding: 15px 0; border-bottom: 1px solid #141414; font-weight: 600;">S/ {{ $node['Verify Booking Signature'].json.total }}</td>
+        </tr>
+      </table>
+      
+      <div style="margin-top: 35px;">
+        <p style="color: #555; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 12px 0;">Especialidades:</p>
+        <p style="color: #ffffff; font-size: 13px; margin: 0; line-height: 1.8; font-weight: 300; letter-spacing: 0.5px;">
+          {{ $node['Verify Booking Signature'].json.services.map(s => '• ' + s.name).join('<br>') }}
+        </p>
+      </div>
+    </div>
+    
+    <div style="margin: 50px 0;">
+      <a href="https://bladesstudio.com/my-bookings" style="display: block; background-color: #D4AF37; color: #050505; padding: 20px 0; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px;">Gestionar mi Reserva</a>
+      
+      <a href="https://wa.me/51XXXXXXXXX" style="display: block; background-color: transparent; border: 1px solid #1a1a1a; color: #666; padding: 18px 0; text-decoration: none; font-weight: 400; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;">Soporte vía WhatsApp</a>
+    </div>
+    
+    <p style="color: #444; font-size: 10px; line-height: 1.8; margin-top: 50px; font-weight: 300; letter-spacing: 1px;">
+      Agradecemos tu puntualidad.<br>
+      Cada minuto está reservado para tu excelencia.
+    </p>
+  </div>
+</div>
+
+<br><br><hr><br><br>
+
+<!-- 3. POST-SERVICE FEEDBACK EMAIL -->
+<div style="background-color: #050505; padding: 80px 20px; text-align: center; font-family: 'Inter', sans-serif;">
+  <div style="max-width: 520px; margin: 0 auto; background-color: #050505; border: 1px solid #1a1a1a; padding: 60px 50px; border-radius: 0;">
+    
+    <div style="margin-bottom: 50px;">
+      <h2 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 32px; letter-spacing: 10px; margin: 0; text-transform: uppercase; font-weight: 300;">BLADES</h2>
+    </div>
+
+    <h1 style="font-family: 'Cormorant Garamond', serif; color: #ffffff; font-size: 26px; font-weight: 300; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase;">Tu Transformación</h1>
+    
+    <p style="color: #888888; font-size: 15px; line-height: 1.8; margin: 30px 0; font-weight: 300; letter-spacing: 0.5px;">
+      Hola <span style="color: #ffffff; font-weight: 400;">{{ $json["user"]["name"] }}</span>. Gracias por confiar en la maestría de Blades Studio. Tu opinión es el estándar que nos permite seguir elevando el arte del grooming.
+    </p>
+    
+    <div style="height: 1px; background-color: #1a1a1a; margin: 50px 0;"></div>
+    
+    <p style="color: #ffffff; font-size: 12px; letter-spacing: 3px; margin-bottom: 35px; text-transform: uppercase; font-weight: 500;">¿CÓMO FUE TU EXPERIENCIA?</p>
+    
+    <a href="https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID" style="display: inline-block; background-color: transparent; border: 1px solid #D4AF37; color: #D4AF37; padding: 20px 50px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase;">Dejar una Reseña</a>
+    
+    <p style="color: #333; font-size: 10px; margin-top: 60px; letter-spacing: 2px; font-weight: 400; text-transform: uppercase;">"True mastery is in the details."</p>
+  </div>
+</div>
