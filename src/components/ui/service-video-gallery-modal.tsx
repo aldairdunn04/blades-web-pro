@@ -65,7 +65,7 @@ export function ServiceVideoGalleryModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 px-4 py-5 backdrop-blur-xl md:py-10"
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/85 px-4 py-5 backdrop-blur-xl md:items-center md:py-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -75,7 +75,7 @@ export function ServiceVideoGalleryModal({
             role="dialog"
             aria-modal="true"
             aria-label={`Galeria de videos: ${title}`}
-            className="relative grid max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-white/10 bg-[#070707] shadow-2xl md:grid-cols-[minmax(280px,420px)_1fr]"
+            className="relative grid max-h-[94dvh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#070707] shadow-2xl md:max-h-[92vh] md:grid-cols-[minmax(280px,420px)_1fr] md:overflow-hidden"
             initial={{ opacity: 0, y: 22, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.98 }}
@@ -92,7 +92,7 @@ export function ServiceVideoGalleryModal({
             </button>
 
             <div className="relative mx-auto w-full max-w-[360px] p-4 md:max-w-none md:p-5">
-              <div className="relative aspect-[9/16] overflow-hidden rounded-2xl border border-primary/20 bg-neutral-950">
+              <div className="relative aspect-[9/16] max-h-[62dvh] overflow-hidden rounded-2xl border border-primary/20 bg-neutral-950 md:max-h-none">
                 <video
                   ref={videoRef}
                   key={activeVideo}
@@ -121,7 +121,7 @@ export function ServiceVideoGalleryModal({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-col justify-between gap-6 overflow-y-auto p-5 pt-0 md:p-8 md:pl-4">
+            <div className="flex min-h-0 flex-col justify-between gap-6 p-5 pt-0 md:overflow-y-auto md:p-8 md:pl-4">
               <div className="space-y-4 pt-1 md:pt-8">
                 <span className="text-[10px] font-black uppercase tracking-[0.32em] text-primary">
                   {label}
@@ -137,33 +137,35 @@ export function ServiceVideoGalleryModal({
               </div>
 
               <div className="space-y-4">
-                <div className="flex gap-3 overflow-x-auto pb-1">
-                  {videos.map((video, index) => (
-                    <button
-                      key={`${video}-${index}`}
-                      type="button"
-                      onClick={() => setActiveIndex(index)}
-                      className={cn(
-                        "relative h-24 w-16 shrink-0 overflow-hidden rounded-xl border bg-neutral-950 transition-all md:h-28 md:w-20",
-                        activeIndex === index
-                          ? "border-primary shadow-[0_0_24px_rgba(212,175,55,0.22)]"
-                          : "border-white/10 opacity-70 hover:border-white/30 hover:opacity-100"
-                      )}
-                      aria-label={`Ver clip ${index + 1} de ${title}`}
-                    >
-                      <video
-                        src={video}
-                        className="h-full w-full object-cover grayscale"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                      <span className="absolute bottom-1 right-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[8px] font-black text-white">
-                        {index + 1}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                {videos.length > 1 && (
+                  <div className="flex gap-3 overflow-x-auto pb-1">
+                    {videos.map((video, index) => (
+                      <button
+                        key={`${video}-${index}`}
+                        type="button"
+                        onClick={() => setActiveIndex(index)}
+                        className={cn(
+                          "relative h-24 w-16 shrink-0 overflow-hidden rounded-xl border bg-neutral-950 transition-all md:h-28 md:w-20",
+                          activeIndex === index
+                            ? "border-primary shadow-[0_0_24px_rgba(212,175,55,0.22)]"
+                            : "border-white/10 opacity-70 hover:border-white/30 hover:opacity-100"
+                        )}
+                        aria-label={`Ver clip ${index + 1} de ${title}`}
+                      >
+                        <video
+                          src={video}
+                          className="h-full w-full object-cover grayscale"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                        <span className="absolute bottom-1 right-1 rounded-full bg-black/75 px-1.5 py-0.5 text-[8px] font-black text-white">
+                          {index + 1}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <button
                   type="button"

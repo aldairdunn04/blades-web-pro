@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, ChevronRight, ChevronLeft, Calendar as CalendarIcon, 
   Clock, ShieldCheck, MessageSquare, 
-  CheckCircle2, Smartphone, Store, AlertCircle, Sparkles
+  CheckCircle2, Smartphone, Store, AlertCircle, Sparkles,
+  Copy, Check
 } from "lucide-react";
 import { Service } from "@/types/services";
 import { cn } from "@/lib/utils";
@@ -64,12 +65,19 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [showQr, setShowQr] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
   const [hpValue, setHpValue] = useState("");
   const [startTime, setStartTime] = useState(0);
   const { clearCart } = useCart();
   const { user, signInWithGoogle, setAuthModalOpen, loading: isAuthLoading } = useAuth();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("998260189");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Scroll to top when step changes
   useEffect(() => {
@@ -264,9 +272,10 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
   const currentStepIdx = steps.indexOf(step);
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-end">
+    <>
+      <AnimatePresence>
+        {isOpen && (
+        <div key="booking-drawer-root" className="fixed inset-0 z-[100] flex justify-end">
           {/* Backdrop with enhanced blur */}
           <motion.div 
             initial={{ opacity: 0 }}
@@ -634,32 +643,51 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-6"
+                        className="relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-[#0c0c0c] to-[#050505] border border-white/5 flex items-center gap-6 group hover:border-primary/20 transition-all duration-500 shadow-[0_0_30px_rgba(212,175,55,0.01)] hover:shadow-[0_0_40px_rgba(212,175,55,0.05)]"
                       >
-                        <div className="relative group shrink-0">
-                          <div className="w-24 h-24 bg-white p-2 rounded-xl shadow-2xl relative overflow-hidden">
-                            {/* QR Placeholder / Iconic representation */}
-                            <div className="w-full h-full bg-black/5 rounded-lg flex items-center justify-center border-2 border-dashed border-black/10">
-                              <Smartphone className="w-8 h-8 opacity-20 text-black" />
-                            </div>
+                        <div 
+                          onClick={() => setShowQr(true)}
+                          className="relative group/qr shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-300"
+                        >
+                          <div className="w-24 h-24 bg-white p-1.5 rounded-xl shadow-2xl relative overflow-hidden border border-white/10">
+                            {/* Real QR Image */}
+                            <img src="/codigo-yape.jpg" className="w-full h-full object-cover rounded-lg" alt="QR Yape" />
                             
                             {/* Laser Scanner Animation */}
                             <motion.div 
                               animate={{ top: ["0%", "100%", "0%"] }}
-                              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                              transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
                               className="absolute left-0 right-0 h-0.5 bg-primary shadow-[0_0_10px_#D4AF37] z-20"
                             />
                           </div>
                           {/* Floating Badge */}
-                          <div className="absolute -top-2 -right-2 bg-primary text-black text-[8px] font-black px-2 py-1 rounded-full shadow-lg animate-bounce">
-                            ESCANEA
+                          <div className="absolute -top-2 -right-2 bg-primary text-black text-[7px] font-black px-2 py-0.5 rounded-full shadow-lg tracking-wider uppercase group-hover/qr:scale-110 transition-transform">
+                            Ver Grande
                           </div>
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Yape a Eliot Cervantes</p>
-                          <p className="text-xl font-serif text-white italic">998 260 189</p>
+                        <div className="flex-1 space-y-1.5 min-w-0">
+                          <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Yape a Eliot Cervantes</p>
+                          
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl font-serif text-white font-bold italic tracking-tight truncate">998 260 189</span>
+                            <button 
+                              onClick={handleCopy}
+                              className="p-2 hover:bg-white/10 rounded-xl text-white/40 hover:text-white transition-all flex items-center gap-1.5 active:scale-90 border border-white/5 hover:border-white/10 shrink-0"
+                              title="Copiar número"
+                            >
+                              {copied ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-green-500 animate-pulse" />
+                                  <span className="text-[8px] text-green-500 font-black uppercase tracking-widest">Copiado</span>
+                                </>
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                          
                           <p className="text-[9px] text-primary/60 font-bold italic leading-tight">
-                            "Escanea y asegura tu lugar en la grilla."
+                            "Toca el QR para ampliar o copia el número."
                           </p>
                         </div>
                       </motion.div>
@@ -827,7 +855,81 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
             </div>
           </motion.div>
         </div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      {/* Large QR Modal Overlay - Premium 21st.dev design */}
+      <AnimatePresence>
+        {showQr && (
+          <motion.div 
+            key="booking-qr-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[120] flex items-center justify-center bg-black/95 backdrop-blur-md p-6"
+            onClick={() => setShowQr(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="relative max-w-sm w-full bg-[#0c0c0c] border border-white/10 p-8 rounded-3xl flex flex-col items-center gap-6 shadow-[0_0_50px_rgba(212,175,55,0.15)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="text-center">
+                <h4 className="text-xl font-serif text-white italic">Yape Oficial Blades</h4>
+                <p className="text-[9px] text-primary font-black tracking-widest uppercase mt-1">Escanea para pagar</p>
+              </div>
+              
+              {/* Real QR image in large */}
+              <div className="relative w-72 h-72 bg-white p-3 rounded-2xl shadow-inner border border-white/5 overflow-hidden">
+                <img src="/codigo-yape.jpg" className="w-full h-full object-contain rounded-xl" alt="QR Yape Grande" />
+                
+                {/* Laser Scanner Animation */}
+                <motion.div 
+                  animate={{ top: ["0%", "100%", "0%"] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                  className="absolute left-0 right-0 h-0.5 bg-primary shadow-[0_0_12px_#D4AF37] z-20"
+                />
+              </div>
+
+              {/* Copy section */}
+              <div className="w-full bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-[8px] text-white/30 uppercase font-black tracking-wider">Titular</p>
+                  <p className="text-sm font-serif text-white font-bold italic">Eliot Cervantes</p>
+                </div>
+                <button 
+                  onClick={handleCopy}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-primary hover:text-black rounded-xl text-xs font-bold text-white transition-all active:scale-95 border border-white/5 hover:border-transparent"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 animate-pulse" />
+                      <span>¡Copiado!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>998 260 189</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Close button */}
+              <button 
+                onClick={() => setShowQr(false)}
+                className="w-full py-4 bg-white text-black font-black text-xs uppercase tracking-[0.2em] rounded-xl hover:bg-primary transition-all active:scale-95"
+              >
+                Cerrar Ventana
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
