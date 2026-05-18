@@ -35,7 +35,7 @@ export default function Home() {
       <AuthorityStats />
       <DeliveryAdvantage />
       <BentoServices onOpenCatalog={handleOpenCatalog} />
-      <MasteryGallery />
+      <MasteryGallery onOpenCatalog={handleOpenCatalog} />
       <ReputationWall />
       <ArtistBio />
       <ContactMap onOpenBooking={() => handleOpenCatalog()} />

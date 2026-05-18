@@ -1,13 +1,15 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface VideoFrameProps {
   src: string;
   badge: string;
   serviceLabel: string;
   label?: string;
+  clipCount?: number;
+  onOpenGallery?: () => void;
   onServiceClick?: () => void;
 }
 
@@ -16,13 +18,14 @@ export function VideoFrame({
   badge,
   serviceLabel,
   label = "RAW_FOOTAGE",
+  clipCount = 1,
+  onOpenGallery,
   onServiceClick,
 }: VideoFrameProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Mobile autoplay via IntersectionObserver
   useEffect(() => {
     const video = videoRef.current;
     const container = containerRef.current;
@@ -52,9 +55,7 @@ export function VideoFrame({
   const handleMouseEnter = () => {
     const video = videoRef.current;
     setIsHovered(true);
-    if (video) {
-      video.play().catch(() => {});
-    }
+    video?.play().catch(() => {});
   };
 
   const handleMouseLeave = () => {
@@ -66,11 +67,29 @@ export function VideoFrame({
     }
   };
 
+  const handleOpen = () => {
+    if (onOpenGallery) {
+      onOpenGallery();
+      return;
+    }
+
+    onServiceClick?.();
+  };
+
   return (
     <div
       ref={containerRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={handleOpen}
+      role={onOpenGallery || onServiceClick ? "button" : undefined}
+      tabIndex={onOpenGallery || onServiceClick ? 0 : undefined}
+      onKeyDown={(event) => {
+        if ((event.key === "Enter" || event.key === " ") && (onOpenGallery || onServiceClick)) {
+          event.preventDefault();
+          handleOpen();
+        }
+      }}
       className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-neutral-950 cursor-pointer select-none"
       style={{
         boxShadow: isHovered
@@ -80,15 +99,12 @@ export function VideoFrame({
         transform: isHovered ? "scale(1.025)" : "scale(1)",
       }}
     >
-      {/* Video */}
       <video
         ref={videoRef}
         src={src}
         className="absolute inset-0 w-full h-full object-cover"
         style={{
-          filter: isHovered
-            ? "grayscale(0%) brightness(1.05)"
-            : "grayscale(100%) brightness(0.6)",
+          filter: isHovered ? "grayscale(0%) brightness(1.05)" : "grayscale(100%) brightness(0.6)",
           transition: "filter 0.65s ease",
         }}
         muted
@@ -98,7 +114,6 @@ export function VideoFrame({
         aria-label={`Video: ${serviceLabel}`}
       />
 
-      {/* Dark gradient overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -109,7 +124,6 @@ export function VideoFrame({
         }}
       />
 
-      {/* Film grain overlay */}
       <div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
@@ -121,7 +135,6 @@ export function VideoFrame({
         }}
       />
 
-      {/* Scanlines */}
       <div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
@@ -131,7 +144,6 @@ export function VideoFrame({
         }}
       />
 
-      {/* TOP LEFT — REC indicator (on hover) */}
       <div className="absolute top-4 left-4 z-20">
         <AnimatePresence>
           {isHovered && (
@@ -150,28 +162,37 @@ export function VideoFrame({
         </AnimatePresence>
       </div>
 
-      {/* TOP RIGHT — File label (on hover) */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            key="label"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="absolute top-4 right-4 z-20"
-          >
-            <span className="text-[7px] font-mono tracking-wider uppercase"
-              style={{ color: "rgba(212,175,55,0.7)" }}>
-              {label}.MP4
+      {clipCount > 1 ? (
+        <div className="absolute top-4 right-4 z-20">
+          <div className="flex items-center gap-1.5 rounded-full border border-primary/35 bg-black/65 px-2.5 py-1 backdrop-blur-md">
+            <span className="text-[8px] font-black uppercase tracking-widest text-primary">
+              +{clipCount - 1} clips
             </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      ) : (
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              key="label"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="absolute top-4 right-4 z-20"
+            >
+              <span
+                className="text-[7px] font-mono tracking-wider uppercase"
+                style={{ color: "rgba(212,175,55,0.7)" }}
+              >
+                {label}.MP4
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
-      {/* BOTTOM — Service info + CTA */}
       <div className="absolute bottom-0 left-0 right-0 z-20 p-4">
-        {/* Gold divider line on hover */}
         <AnimatePresence>
           {isHovered && (
             <motion.div
@@ -189,7 +210,6 @@ export function VideoFrame({
           )}
         </AnimatePresence>
 
-        {/* Badge */}
         <div
           className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full border"
           style={{
@@ -201,7 +221,6 @@ export function VideoFrame({
           <span className="text-[8px] font-black tracking-widest text-white uppercase">{badge}</span>
         </div>
 
-        {/* CTA */}
         <AnimatePresence>
           {isHovered && (
             <motion.button
@@ -210,7 +229,10 @@ export function VideoFrame({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              onClick={onServiceClick}
+              onClick={(event) => {
+                event.stopPropagation();
+                handleOpen();
+              }}
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold tracking-widest uppercase cursor-pointer border"
               style={{
                 backgroundColor: "rgba(212,175,55,0.12)",
@@ -219,13 +241,13 @@ export function VideoFrame({
                 color: "#D4AF37",
                 transition: "background-color 0.2s ease, border-color 0.2s ease",
               }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(212,175,55,0.22)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(212,175,55,0.6)";
+              onMouseEnter={(event) => {
+                event.currentTarget.style.backgroundColor = "rgba(212,175,55,0.22)";
+                event.currentTarget.style.borderColor = "rgba(212,175,55,0.6)";
               }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(212,175,55,0.12)";
-                (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(212,175,55,0.35)";
+              onMouseLeave={(event) => {
+                event.currentTarget.style.backgroundColor = "rgba(212,175,55,0.12)";
+                event.currentTarget.style.borderColor = "rgba(212,175,55,0.35)";
               }}
             >
               <span>Ver Servicio</span>

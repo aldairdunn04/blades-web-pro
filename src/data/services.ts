@@ -5,7 +5,7 @@ export const services: Service[] = [
   {
     id: 'servicio-basico',
     name: 'Servicio Básico',
-    description: 'Corte clásico o degradado de alta precisión + Styling con productos premium. La base de tu estilo.',
+    description: 'Corte + Cejas + Bebidas y snacks.',
     price: 25,
     duration: '50 min',
     category: 'Barbería',
@@ -39,8 +39,8 @@ export const services: Service[] = [
   // BARBA & ROSTRO
   {
     id: 'servicio-premium',
-    name: 'Servicio Premium (Combo)',
-    description: 'Nuestra experiencia más completa: Corte + Barba + Lavado + Mascarilla Black. Renovación absoluta.',
+    name: 'Servicio Premium',
+    description: 'Corte + lavado + Cejas + Styling y Peinado con productos + Black Mask + Parches para ojeras + Bebidas y snacks.',
     price: 35,
     duration: '90 min',
     category: 'Barba & Rostro',
@@ -67,7 +67,7 @@ export const services: Service[] = [
   {
     id: 'servicio-vip',
     name: 'Servicio V.I.P',
-    description: 'La experiencia definitiva de maestría. Tratamiento Facial Profundo + Vapor de Ozono + Nutrición Dérmica de Alto Nivel.',
+    description: 'Todo lo del Premium + Limpieza facial profunda + vaporizador de ozono + Perfilado de barba o afeitado + Cerveza.',
     price: 50,
     duration: '120 min',
     category: 'Cuidado Facial',

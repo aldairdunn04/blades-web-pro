@@ -1,13 +1,20 @@
 "use client";
 
-import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
+import { useState } from "react";
+import { BentoGridItem } from "@/components/ui/bento-grid";
+import { ServiceVideoGalleryModal } from "@/components/ui/service-video-gallery-modal";
 import { VideoFrame } from "@/components/ui/video-frame";
-import { Scissors, Baby, Palette, MapPin } from "lucide-react";
+import { Baby, Droplets, MapPin, Palette, Scissors, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
+import { services } from "@/data/services";
+import type { Service } from "@/types/services";
 
-// Variants para staggered reveal al hacer scroll
-const containerVariants = {
+interface MasteryGalleryProps {
+  onOpenCatalog?: (service?: Service) => void;
+}
+
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -16,7 +23,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 40, scale: 0.96 },
   visible: {
     opacity: 1,
@@ -30,47 +37,98 @@ const items = [
   {
     title: "Corte de Autor",
     description: "Precisión arquitectónica. Diseños esculpidos a medida para tu estructura facial.",
-    videoSrc: "/videos/corte-de-autor.mp4",
+    videos: [
+      "/videos/corte-de-autor.mp4",
+      "/videos/corte-de-autor-02.mp4",
+      "/videos/corte-de-autor-03.mp4",
+      "/videos/corte-de-autor-04.mp4",
+    ],
     badge: "100% Precision",
     label: "MASTERY_01",
+    serviceId: "corte-maestro",
     serviceLabel: "Corte de Autor",
     icon: <Scissors className="h-4 w-4 text-primary" />,
   },
   {
+    title: "Limpieza Facial",
+    description: "Cuidado facial profundo. Piel renovada, limpia y preparada con detalle profesional.",
+    videos: ["/videos/limpieza-facial.mp4"],
+    badge: "Skin Detail",
+    label: "MASTERY_02",
+    serviceId: "limpieza-facial",
+    serviceLabel: "Limpieza Facial Profunda",
+    icon: <Droplets className="h-4 w-4 text-primary" />,
+  },
+  {
     title: "Arte Urbano",
     description: "Streetwear estético. Fade de alto contraste y texturas disruptivas.",
-    videoSrc: "/videos/arte-urbano.mp4",
+    videos: [
+      "/videos/arte-urbano.mp4",
+      "/videos/arte-urbano-02.mp4",
+      "/videos/arte-urbano-03.mp4",
+      "/videos/arte-urbano-04.mp4",
+    ],
     badge: "Artistic",
-    label: "MASTERY_02",
+    label: "MASTERY_03",
+    serviceId: "diseno-freestyle",
     serviceLabel: "Arte Urbano",
     icon: <Palette className="h-4 w-4 text-primary" />,
   },
   {
+    title: "Color",
+    description: "Colorimetría premium. Transformaciones precisas con acabado vibrante y control técnico.",
+    videos: ["/videos/color.mp4"],
+    badge: "Color Work",
+    label: "MASTERY_04",
+    serviceId: "colorimetria",
+    serviceLabel: "Colorimetría Global",
+    icon: <Sparkles className="h-4 w-4 text-primary" />,
+  },
+  {
     title: "Next Gen",
     description: "Nuevas tendencias. Estilo contemporáneo adaptado para líderes del futuro.",
-    videoSrc: "/videos/next-gen.mp4",
+    videos: [
+      "/videos/next-gen.mp4",
+      "/videos/next-gen-02.mp4",
+      "/videos/next-gen-03.mp4",
+      "/videos/next-gen-04.mp4",
+    ],
     badge: "Kids Specialist",
-    label: "MASTERY_03",
+    label: "MASTERY_05",
+    serviceId: "servicio-basico",
     serviceLabel: "Next Gen",
     icon: <Baby className="h-4 w-4 text-primary" />,
   },
   {
     title: "Elite Delivery",
-    description: "Servicio premium a domicilio. La experiencia Blades Studio en tu espacio.",
-    videoSrc: "/videos/elite-delivery.mp4",
+    description: "Servicio premium a domicilio. La experiencia Blades Barber Studio en tu espacio.",
+    videos: [
+      "/videos/elite-delivery.mp4",
+      "/videos/elite-delivery-02.mp4",
+      "/videos/elite-delivery-03.mp4",
+      "/videos/elite-delivery-04.mp4",
+    ],
     badge: "Home Service",
-    label: "MASTERY_04",
+    label: "MASTERY_06",
+    serviceId: "delivery-vip",
     serviceLabel: "Elite Delivery",
     icon: <MapPin className="h-4 w-4 text-primary" />,
   },
 ];
 
-export function MasteryGallery() {
-  const handleServiceClick = (serviceLabel: string) => {
-    // Guardamos el servicio en sessionStorage para que el formulario de Booking lo preseleccione
-    sessionStorage.setItem("preselectedService", serviceLabel);
-    
-    // Scroll suave hacia la sección de booking
+export function MasteryGallery({ onOpenCatalog }: MasteryGalleryProps) {
+  const [activeItem, setActiveItem] = useState<(typeof items)[number] | null>(null);
+
+  const handleServiceClick = (item: (typeof items)[number]) => {
+    const service = services.find((candidate) => candidate.id === item.serviceId);
+
+    if (service && onOpenCatalog) {
+      onOpenCatalog(service);
+      return;
+    }
+
+    sessionStorage.setItem("preselectedService", item.serviceLabel);
+
     const bookingSection = document.getElementById("booking");
     if (bookingSection) {
       bookingSection.scrollIntoView({ behavior: "smooth" });
@@ -79,7 +137,6 @@ export function MasteryGallery() {
 
   return (
     <section id="gallery" className="py-32 bg-background relative overflow-hidden">
-      {/* Header section — conservado del diseño original */}
       <div className="container px-4 mx-auto mb-20 relative z-10">
         <div className="max-w-2xl">
           <motion.span
@@ -112,7 +169,6 @@ export function MasteryGallery() {
         </div>
       </div>
 
-      {/* Desktop: Grid con VideoFrames */}
       <div className="hidden md:block max-w-7xl mx-auto px-4 relative z-10">
         <motion.div
           variants={containerVariants}
@@ -120,13 +176,9 @@ export function MasteryGallery() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {items.map((item, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants as any}
-                className="h-full"
-              >
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item) => (
+              <motion.div key={item.label} variants={itemVariants} className="h-full">
                 <BentoGridItem
                   title={
                     <span className="text-xl font-bold tracking-tighter uppercase">
@@ -140,11 +192,12 @@ export function MasteryGallery() {
                   }
                   header={
                     <VideoFrame
-                      src={item.videoSrc}
+                      src={item.videos[0]}
                       badge={item.badge}
                       serviceLabel={item.serviceLabel}
                       label={item.label}
-                      onServiceClick={() => handleServiceClick(item.serviceLabel)}
+                      clipCount={item.videos.length}
+                      onOpenGallery={() => setActiveItem(item)}
                     />
                   }
                   className={cn(
@@ -158,7 +211,6 @@ export function MasteryGallery() {
         </motion.div>
       </div>
 
-      {/* Mobile: Carousel horizontal con scroll snap */}
       <div className="md:hidden px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -173,13 +225,12 @@ export function MasteryGallery() {
             msOverflowStyle: "none",
           }}
         >
-          {items.map((item, i) => (
+          {items.map((item) => (
             <div
-              key={i}
+              key={item.label}
               className="flex-shrink-0 w-[75vw]"
               style={{ scrollSnapAlign: "center" }}
             >
-              {/* Card info */}
               <div className="flex items-center gap-2 mb-3">
                 {item.icon}
                 <div>
@@ -190,28 +241,37 @@ export function MasteryGallery() {
                 </div>
               </div>
               <VideoFrame
-                src={item.videoSrc}
+                src={item.videos[0]}
                 badge={item.badge}
                 serviceLabel={item.serviceLabel}
                 label={item.label}
-                onServiceClick={() => handleServiceClick(item.serviceLabel)}
+                clipCount={item.videos.length}
+                onOpenGallery={() => setActiveItem(item)}
               />
             </div>
           ))}
         </motion.div>
 
-        {/* Scroll indicator dots */}
         <div className="flex justify-center gap-2 mt-4">
-          {items.map((_, i) => (
-            <div
-              key={i}
-              className="w-1 h-1 rounded-full bg-white/20"
-            />
+          {items.map((item) => (
+            <div key={item.label} className="w-1 h-1 rounded-full bg-white/20" />
           ))}
         </div>
       </div>
 
-      {/* Decorative vertical line — conservada del diseño original */}
+      {activeItem && (
+        <ServiceVideoGalleryModal
+          isOpen={Boolean(activeItem)}
+          title={activeItem.title}
+          description={activeItem.description}
+          badge={activeItem.badge}
+          label={activeItem.label}
+          videos={activeItem.videos}
+          onClose={() => setActiveItem(null)}
+          onReserve={() => handleServiceClick(activeItem)}
+        />
+      )}
+
       <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/10 to-transparent -translate-x-1/2" />
     </section>
   );

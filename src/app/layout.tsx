@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   keywords: ["Barbería San Juan de Lurigancho", "Barbero a domicilio Lima", "Eliott Blades Barber", "Mejor corte de cabello SJL", "Barbería VIP"],
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/barber-favicon.jpg",
+    apple: "/logo-premium.png",
   },
   openGraph: {
     title: "Blades Barber Studio | Maestría en Precisión",

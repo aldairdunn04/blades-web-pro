@@ -34,7 +34,7 @@ const testimonials = [
 
 export function ReputationWall() {
   return (
-    <section id="reputation" className="py-24 bg-background relative overflow-hidden">
+    <section id="reputation" className="py-32 bg-background relative overflow-hidden">
       {/* Decorative background element */}
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full -translate-y-1/2 pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full translate-y-1/2 pointer-events-none" />

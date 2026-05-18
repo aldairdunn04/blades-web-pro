@@ -10,7 +10,7 @@ interface ContactMapProps {
 
 export function ContactMap({ onOpenBooking }: ContactMapProps) {
   return (
-    <section id="contact" className="py-24 bg-black relative overflow-hidden">
+    <section id="contact" className="py-32 bg-black relative overflow-hidden">
       <div className="container px-4 mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
           {/* Contact Details */}
@@ -40,8 +40,8 @@ export function ContactMap({ onOpenBooking }: ContactMapProps) {
                   <div>
                     <h4 className="text-white font-bold mb-1">Dirección</h4>
                     <p className="text-muted leading-relaxed">
-                      Jr. El Morro A1-4<br />
-                      San Juan de Lurigancho, Lima
+                      Jr. Agustín Jiménez<br />
+                      Mariscal Cáceres, San Juan de Lurigancho
                     </p>
                     <a 
                       href="https://maps.app.goo.gl/3Syic3pBpNf4Ce927" 

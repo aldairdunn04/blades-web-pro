@@ -110,13 +110,12 @@ export function DeliveryAdvantage() {
 
   const y1 = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const y2 = useTransform(scrollYProgress, [0, 1], [-50, 50]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 1, 0.95]);
 
   return (
     <section 
       id="delivery" 
       ref={containerRef}
-      className="py-40 bg-[#050505] relative overflow-hidden"
+      className="py-32 bg-[#050505] relative overflow-hidden"
     >
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -170,34 +169,9 @@ export function DeliveryAdvantage() {
                 <AdvantageCard key={idx} feature={feature} index={idx} />
               ))}
             </div>
-            
-            {/* Massive Visual Card */}
-            <motion.div 
-              style={{ scale }}
-              className="relative aspect-[16/7] md:aspect-[21/9] rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0A0A0A] group"
-            >
-              <img 
-                src="/assets/delivery-service.png" 
-                alt="Servicio de Autor" 
-                className="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-              <div className="absolute bottom-10 left-10 right-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="max-w-sm">
-                  <div className="text-2xl font-bold tracking-tight mb-2 text-white uppercase">Precisión Quirúrgica</div>
-                  <p className="text-sm text-muted/60 font-light">Equipamiento transportado bajo los más altos estándares de seguridad y estilo.</p>
-                </div>
-                <button className="px-8 py-4 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-primary transition-colors duration-300">
-                  Explorar Concepto
-                </button>
-              </div>
-            </motion.div>
           </div>
-
         </div>
       </div>
     </section>
   );
 }
-
-

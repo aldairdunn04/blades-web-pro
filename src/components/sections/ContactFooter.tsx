@@ -45,7 +45,7 @@ export function ContactFooter() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">
             <span className="text-xl font-black tracking-tighter text-white">
-              BLADES <span className="text-primary italic">STUDIO</span>
+              BLADES BARBER <span className="text-primary italic">STUDIO</span>
             </span>
             <span className="text-[10px] text-muted font-bold tracking-widest uppercase">
               MAESTRÍA EN PRECISIÓN — SJL
