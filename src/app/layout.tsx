@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: "/barber-favicon.jpg",
-    apple: "/logo-premium.png",
+    apple: "/barber-favicon.jpg",
   },
   openGraph: {
     title: "Blades Barber Studio | Maestría en Precisión",

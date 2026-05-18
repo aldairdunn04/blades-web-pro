@@ -46,7 +46,7 @@ export function FloatingNavbar({ onOpenBooking, isHidden }: FloatingNavbarProps)
         <div className="flex items-center gap-3">
           <div className="relative group">
             <div className="absolute -inset-1 bg-primary/20 blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-            <img src="/logo-premium.png" className="relative w-8 h-8 md:w-9 md:h-9 object-contain" alt="Blades Logo" />
+            <img src="/barber-favicon.jpg" className="relative w-8 h-8 md:w-9 md:h-9 object-contain" alt="Blades Logo" />
           </div>
           <span className="font-black text-xl tracking-tighter text-white">BLADES</span>
         </div>

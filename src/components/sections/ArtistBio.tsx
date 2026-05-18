@@ -53,7 +53,7 @@ export function ArtistBio() {
             
             <div className="mt-12 flex gap-8">
                <div>
-                  <div className="text-3xl font-bold text-white">4</div>
+                  <div className="text-3xl font-bold text-white">5</div>
                   <div className="text-[10px] text-primary font-black tracking-widest">AÑOS EXP.</div>
                </div>
                <div>

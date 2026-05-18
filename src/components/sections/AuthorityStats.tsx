@@ -24,7 +24,7 @@ const stats = [
   },
   {
     label: "TRAYECTORIA",
-    value: "4",
+    value: "5",
     icon: <Award className="w-4 h-4 text-primary" />,
     description: "Años Perfeccionando",
   },
