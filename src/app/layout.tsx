@@ -62,7 +62,7 @@ export default function RootLayout({
     "telephone": "+51998260189",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Jr. El Morro A1-4",
+      "streetAddress": "Jr. Agustín Jiménez, Mariscal Cáceres",
       "addressLocality": "San Juan de Lurigancho",
       "addressRegion": "Lima",
       "postalCode": "15446",

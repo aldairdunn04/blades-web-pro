@@ -254,7 +254,7 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
       `*SENSIBILIDAD:* ${sensitivityStr}\n` +
       `*Comentarios:* ${comment || "Ninguno"}\n\n` +
       `*Método de Pago:* ${paymentStr}\n\n` +
-      `*Dirección:* Jr. El Morro A1-4, SJL.\n\n` +
+      `*Dirección:* Jr. Agustín Jiménez, Mariscal Cáceres, SJL.\n\n` +
       `_Por favor confirmar disponibilidad._`;
 
     return `https://wa.me/51998260189?text=${encodeURIComponent(text)}`;
@@ -724,7 +724,7 @@ export function BookingFlow({ services, isOpen, onClose }: BookingFlowProps) {
                           <div className="space-y-1">
                             <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Dirección de Estudio</span>
                             <p className="text-white/60 font-medium text-[10px] leading-relaxed">
-                              Jr. El Morro A1-4, San Juan de Lurigancho, Lima.
+                              Jr. Agustín Jiménez, Mariscal Cáceres, San Juan de Lurigancho.
                             </p>
                           </div>
                         </div>
